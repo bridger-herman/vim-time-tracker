@@ -90,7 +90,7 @@ function! g:TimeTrackerStatus()
     endif
   endfor
 
-  if previous_2 == 0
+  if previous_1 != 0 && previous_2 == 0
     let sum += localtime() - previous_1
   endif
 
