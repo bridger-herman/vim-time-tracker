@@ -1,4 +1,4 @@
-let g:time_tracker_config_file = '.time_tracker'
+let g:time_tracker_dir = expand('~/.vim/.time_tracker/')
 
 function! g:GetRootGitRepo()
   let full_path = ''
@@ -17,27 +17,63 @@ function! g:GetRootGitRepo()
 endfunction
 
 function! g:TimeTrackerClockIn()
-  if !filereadable(g:time_tracker_config_file)
+  " Check if in a git repo - if so it's a project
+  let tracker_name = GetRootGitRepo()
+  if tracker_name == ''
     return
   endif
-  let rows = readfile(g:time_tracker_config_file)
-  let rows = rows + [localtime()]
-  if writefile(rows, g:time_tracker_config_file)
+
+  let tracker_file = g:time_tracker_dir . tracker_name
+  if !filereadable(tracker_file)
+    if writefile([localtime()], tracker_file)
+      !mkdir -p g:time_tracker_dir
+      if writefile([localtime()], tracker_file)
+        echom 'Still failed to write, shit'
+      endif
+    endif
+    return
+  endif
+
+  let rows = readfile(tracker_file)
+  if get(rows, len(rows) - 1) == ''
+    if writefile(rows + [localtime()], tracker_file)
+    endif
+  else
+    if writefile(rows + ['ignore'], tracker_file)
+    endif
   endif
 endfunction
 
 function! g:TimeTrackerClockOut()
-  if !filereadable(g:time_tracker_config_file)
+  " Check if in a git repo - if so it's a project
+  let tracker_name = GetRootGitRepo()
+  if tracker_name == ''
     return
   endif
-  let rows = readfile(g:time_tracker_config_file)
-  let rows = rows + [localtime(), ""]
-  if writefile(rows, g:time_tracker_config_file)
+
+  let tracker_file = g:time_tracker_dir . tracker_name
+  if !filereadable(tracker_file)
+    return
+  endif
+  let rows = readfile(tracker_file)
+  if get(rows, len(rows) - 1) == 'ignore'
+    if writefile(rows[:-2], tracker_file)
+    endif
+  else
+    if writefile(rows + [localtime(), ''], tracker_file)
+    endif
   endif
 endfunction
 
 function! g:TimeTrackerStatus()
-  let rows = readfile(g:time_tracker_config_file)
+  " Check if in a git repo - if so it's a project
+  let tracker_name = GetRootGitRepo()
+  if tracker_name == ''
+    return
+  endif
+
+  let tracker_file = g:time_tracker_dir . tracker_name
+  let rows = readfile(tracker_file)
 
   let sum = 0
   let previous_1 = 0
