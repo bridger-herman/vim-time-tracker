@@ -1,5 +1,20 @@
 let g:time_tracker_config_file = '.time_tracker'
 
+function! g:GetRootGitRepo()
+  let full_path = ''
+  let git_dir = ''
+  let path_arg = '%:p'
+  while full_path != '/'
+    let full_path = expand(path_arg)
+    let listing = split(globpath(full_path, '.git'), '\n')
+    if len(listing) > 0
+      let git_dir = full_path
+    endif
+    let path_arg = path_arg . ':h'
+  endwhile
+
+  return substitute(git_dir, '/', '_', 'g')
+endfunction
 
 function! g:TimeTrackerClockIn()
   if !filereadable(g:time_tracker_config_file)
