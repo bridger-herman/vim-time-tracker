@@ -104,3 +104,4 @@ endfunction
 
 autocmd VimEnter * silent! call TimeTrackerClockIn() | redraw!
 autocmd VimLeave * silent! call TimeTrackerClockOut()
+nnoremap TT :call TimeTrackerStatus()<CR>
