@@ -1,6 +1,6 @@
 let g:time_tracker_dir = expand('~/.vim/.time_tracker/')
 
-function! g:GetRootGitRepo()
+function! GetRootGitRepo()
   let full_path = ''
   let git_dir = ''
   let path_arg = '%:p'
