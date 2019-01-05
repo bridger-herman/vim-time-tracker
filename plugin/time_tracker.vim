@@ -26,7 +26,7 @@ function! g:TimeTrackerClockIn()
   let tracker_file = g:time_tracker_dir . tracker_name
   if !filereadable(tracker_file)
     if writefile([localtime()], tracker_file)
-      !mkdir -p g:time_tracker_dir
+      execute '!mkdir -p ' . g:time_tracker_dir
       if writefile([localtime()], tracker_file)
         echom 'Still failed to write, shit'
       endif
@@ -102,5 +102,5 @@ function! g:TimeTrackerStatus()
   echom printf('Working for %d:%02d:%02d', hours, minutes, seconds)
 endfunction
 
-" autocmd VimEnter * call TimeTrackerClockIn()
-" autocmd VimLeave * call TimeTrackerClockOut()
+autocmd VimEnter * silent! call TimeTrackerClockIn() | redraw!
+autocmd VimLeave * silent! call TimeTrackerClockOut()
